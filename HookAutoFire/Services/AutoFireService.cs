@@ -17,11 +17,15 @@ namespace HookAutoFire.Services
         private Thread? keyboardThread;
         private volatile bool shouldStop = false;
         
+        public static Action<string>? LogMessageCallback;
+        
         // 설정 가능한 인터벌
         public int MouseInterval { get; set; } = 1;
-        public int KeyboardInterval { get; set; } = 100;
-        public int KeyboardDownLatency { get; set; } = 55; // DOWN 후 간격
-        public int KeyboardUpLatency { get; set; } = 55; // UP 후 간격
+        public int MouseDownLatency { get; set; } = 1; // 마우스 DOWN 후 간격
+        public int MouseUpLatency { get; set; } = 1; // 마우스 UP 후 간격
+        public int KeyboardInterval { get; set; } = 1;
+        public int KeyboardDownLatency { get; set; } = 1; // 키보드 DOWN 후 간격
+        public int KeyboardUpLatency { get; set; } = 1; // 키보드 UP 후 간격
 
         // 고정밀 타이머
         private readonly Stopwatch globalTimer = Stopwatch.StartNew();
@@ -137,9 +141,24 @@ namespace HookAutoFire.Services
 
         private void ProcessAutoFire(MouseButton button)
         {
-            // 참조 코드 스타일: 더 나은 반응성을 위해 UP 다음 DOWN
-            inputSimulator.SimulateButtonUp(button);
+            LogMessageCallback?.Invoke($"ProcessAutoFire 실행: {button} 버튼");
+            
+            // DOWN → UP 순서로 변경 (마우스가 눌린 상태로 남지 않도록)
             inputSimulator.SimulateButtonDown(button);
+            LogMessageCallback?.Invoke($"마우스 DOWN 시뮬레이션: {button}");
+            
+            if (MouseDownLatency > 0)
+            {
+                PreciseWait(MouseDownLatency);
+            }
+            
+            inputSimulator.SimulateButtonUp(button);
+            LogMessageCallback?.Invoke($"마우스 UP 시뮬레이션: {button}");
+            
+            if (MouseUpLatency > 0)
+            {
+                PreciseWait(MouseUpLatency);
+            }
         }
 
         private void ProcessSpaceAutoFire()
@@ -212,9 +231,16 @@ namespace HookAutoFire.Services
             bool rightAutoFire = buttonState.GetAutoFireState(MouseButton.Right);
             bool middleAutoFire = buttonState.GetAutoFireState(MouseButton.Middle);
             
-            bool leftActive = leftAutoFire && IsKeyPressed(VK_LBUTTON);
-            bool rightActive = rightAutoFire && IsKeyPressed(VK_RBUTTON);
-            bool middleActive = middleAutoFire && IsKeyPressed(VK_MBUTTON);
+            // X1+마우스 조합에서는 원본 마우스 입력이 차단되므로 AutoFire 상태만으로 판단
+            bool leftActive = leftAutoFire;
+            bool rightActive = rightAutoFire;
+            bool middleActive = middleAutoFire;
+            
+            // 디버깅 로그
+            if (leftAutoFire || rightAutoFire || middleAutoFire)
+            {
+                LogMessageCallback?.Invoke($"AutoFire 상태 - L:{leftAutoFire}({leftActive}), R:{rightAutoFire}({rightActive}), M:{middleAutoFire}({middleActive})");
+            }
 
             // 왼쪽 마우스
             if (leftActive)
@@ -233,6 +259,10 @@ namespace HookAutoFire.Services
             }
             else
             {
+                if (nextLeftMouseTime != 0) // 이전에 활성화되었던 경우
+                {
+                    inputSimulator.SimulateButtonUp(MouseButton.Left); // 강제로 UP 보내기
+                }
                 nextLeftMouseTime = 0; // 리셋
             }
 
@@ -252,6 +282,10 @@ namespace HookAutoFire.Services
             }
             else
             {
+                if (nextRightMouseTime != 0) // 이전에 활성화되었던 경우
+                {
+                    inputSimulator.SimulateButtonUp(MouseButton.Right); // 강제로 UP 보내기
+                }
                 nextRightMouseTime = 0;
             }
 
@@ -271,6 +305,10 @@ namespace HookAutoFire.Services
             }
             else
             {
+                if (nextMiddleMouseTime != 0) // 이전에 활성화되었던 경우
+                {
+                    inputSimulator.SimulateButtonUp(MouseButton.Middle); // 강제로 UP 보내기
+                }
                 nextMiddleMouseTime = 0;
             }
         }

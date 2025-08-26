@@ -17,6 +17,8 @@ namespace HookAutoFire.Services
         public event EventHandler<MouseButton>? MouseButtonDown;
         public event EventHandler<MouseButton>? MouseButtonUp;
         public event EventHandler? XButton1Released;
+        
+        public static Action<string>? LogMessageCallback;
 
         public MouseHookManager(MouseButtonState buttonState)
         {
@@ -58,22 +60,43 @@ namespace HookAutoFire.Services
                 // 주입되지 않은 마우스 이벤트만 처리 (참조 코드는 0x01 플래그 체크 사용)
                 if ((hookStruct->flags & 0x01) == 0x00)
                 {
+                    bool isXButton1Pressed = IsKeyPressed(VK_XBUTTON1);
+                    
                     switch (mouseEvent)
                     {
                         case WM_LBUTTONDOWN:
                         case WM_RBUTTONDOWN:
                         case WM_MBUTTONDOWN:
                             var button = GetMouseButtonFromEvent(mouseEvent);
-                            buttonState.SetAutoFireState(button, true);
                             MouseButtonDown?.Invoke(this, button);
-                            break;
+                            
+                            // 디버깅 로그
+                            LogMessageCallback?.Invoke($"마우스 DOWN - 버튼: {button}, X1 상태: {isXButton1Pressed}");
+                            
+                            // X1+마우스 조합일 때만 자동클릭 시작하고 원본 차단
+                            if (isXButton1Pressed)
+                            {
+                                LogMessageCallback?.Invoke($"X1+{button} 자동클릭 시작!");
+                                buttonState.SetAutoFireState(button, true);
+                                return (IntPtr)1;
+                            }
+                            break; // 일반 마우스 DOWN은 통과
+                            
                         case WM_LBUTTONUP:
                         case WM_RBUTTONUP:
                         case WM_MBUTTONUP:
                             var buttonUp = GetMouseButtonFromEvent(mouseEvent);
-                            buttonState.SetAutoFireState(buttonUp, false);
                             MouseButtonUp?.Invoke(this, buttonUp);
-                            break;
+                            
+                            // 마우스 UP이면 자동 클릭 중지
+                            buttonState.SetAutoFireState(buttonUp, false);
+                            
+                            // X1+마우스 조합이었다면 UP도 차단
+                            if (isXButton1Pressed)
+                            {
+                                return (IntPtr)1;
+                            }
+                            break; // 일반 마우스 UP은 통과
                     }
                 }
             }
@@ -96,7 +119,9 @@ namespace HookAutoFire.Services
 
         private bool IsKeyPressed(int virtualKeyCode)
         {
-            return (GetKeyState(virtualKeyCode) & KEY_PRESSED) != 0;
+            int keyState = GetKeyState(virtualKeyCode);
+            bool pressed = (keyState & KEY_PRESSED) != 0;
+            return pressed;
         }
 
         private MouseButton GetMouseButtonFromEvent(int mouseEvent)

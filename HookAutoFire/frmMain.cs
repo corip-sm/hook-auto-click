@@ -39,6 +39,10 @@ namespace HookAutoFire
 
         private void InitializeServices()
         {
+            // 로그 콜백 설정
+            MouseHookManager.LogMessageCallback = LogMessage;
+            AutoFireService.LogMessageCallback = LogMessage;
+            
             // 마우스 후킹 이벤트 설정
             hookManager.XButton1Released += OnXButton1Released;
             hookManager.MouseButtonDown += OnMouseButtonDown;
@@ -227,12 +231,16 @@ namespace HookAutoFire
             
             // UI에 설정값 반영
             nudMouseInterval.Value = settingsManager.CurrentSettings.MouseInterval;
+            nudMouseDownLatency.Value = settingsManager.CurrentSettings.MouseDownLatency;
+            nudMouseUpLatency.Value = settingsManager.CurrentSettings.MouseUpLatency;
             nudKeyboardInterval.Value = settingsManager.CurrentSettings.KeyboardInterval;
             nudKeyboardDownLatency.Value = settingsManager.CurrentSettings.KeyboardDownLatency;
             nudKeyboardUpLatency.Value = settingsManager.CurrentSettings.KeyboardUpLatency;
             
             // AutoFireService에 설정값 적용
             autoFireService.MouseInterval = settingsManager.CurrentSettings.MouseInterval;
+            autoFireService.MouseDownLatency = settingsManager.CurrentSettings.MouseDownLatency;
+            autoFireService.MouseUpLatency = settingsManager.CurrentSettings.MouseUpLatency;
             autoFireService.KeyboardInterval = settingsManager.CurrentSettings.KeyboardInterval;
             autoFireService.KeyboardDownLatency = settingsManager.CurrentSettings.KeyboardDownLatency;
             autoFireService.KeyboardUpLatency = settingsManager.CurrentSettings.KeyboardUpLatency;
@@ -242,12 +250,15 @@ namespace HookAutoFire
         {
             btnSaveSettings.Click += BtnSaveSettings_Click;
             btnResetSettings.Click += BtnResetSettings_Click;
+            btnClearLog.Click += BtnClearLog_Click;
         }
 
         private void BtnSaveSettings_Click(object? sender, EventArgs e)
         {
             // UI에서 설정값 가져와서 저장
             settingsManager.CurrentSettings.MouseInterval = (int)nudMouseInterval.Value;
+            settingsManager.CurrentSettings.MouseDownLatency = (int)nudMouseDownLatency.Value;
+            settingsManager.CurrentSettings.MouseUpLatency = (int)nudMouseUpLatency.Value;
             settingsManager.CurrentSettings.KeyboardInterval = (int)nudKeyboardInterval.Value;
             settingsManager.CurrentSettings.KeyboardDownLatency = (int)nudKeyboardDownLatency.Value;
             settingsManager.CurrentSettings.KeyboardUpLatency = (int)nudKeyboardUpLatency.Value;
@@ -256,6 +267,8 @@ namespace HookAutoFire
             
             // AutoFireService에 새 설정값 적용
             autoFireService.MouseInterval = settingsManager.CurrentSettings.MouseInterval;
+            autoFireService.MouseDownLatency = settingsManager.CurrentSettings.MouseDownLatency;
+            autoFireService.MouseUpLatency = settingsManager.CurrentSettings.MouseUpLatency;
             autoFireService.KeyboardInterval = settingsManager.CurrentSettings.KeyboardInterval;
             autoFireService.KeyboardDownLatency = settingsManager.CurrentSettings.KeyboardDownLatency;
             autoFireService.KeyboardUpLatency = settingsManager.CurrentSettings.KeyboardUpLatency;
@@ -291,6 +304,36 @@ namespace HookAutoFire
                 timer.Dispose();
             };
             timer.Start();
+        }
+
+        private void BtnClearLog_Click(object? sender, EventArgs e)
+        {
+            txtLog.Clear();
+        }
+
+        public void LogMessage(string message)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action<string>(LogMessage), message);
+                return;
+            }
+
+            string timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
+            string logEntry = $"[{timestamp}] {message}";
+            
+            txtLog.AppendText(logEntry + Environment.NewLine);
+            txtLog.SelectionStart = txtLog.Text.Length;
+            txtLog.ScrollToCaret();
+            
+            // 로그가 너무 많으면 앞쪽 제거 (1000줄 제한)
+            if (txtLog.Lines.Length > 1000)
+            {
+                var lines = txtLog.Lines;
+                var newLines = new string[500];
+                Array.Copy(lines, 500, newLines, 0, 500);
+                txtLog.Lines = newLines;
+            }
         }
 
         private void Cleanup()

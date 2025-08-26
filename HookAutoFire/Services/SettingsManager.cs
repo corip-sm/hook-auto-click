@@ -25,9 +25,11 @@ namespace HookAutoFire.Services
             try
             {
                 CurrentSettings.MouseInterval = iniManager.ReadInt(SECTION_INTERVALS, "MouseInterval", 1);
-                CurrentSettings.KeyboardInterval = iniManager.ReadInt(SECTION_INTERVALS, "KeyboardInterval", 10);
-                CurrentSettings.KeyboardDownLatency = iniManager.ReadInt(SECTION_INTERVALS, "KeyboardDownLatency", 55);
-                CurrentSettings.KeyboardUpLatency = iniManager.ReadInt(SECTION_INTERVALS, "KeyboardUpLatency", 55);
+                CurrentSettings.MouseDownLatency = iniManager.ReadInt(SECTION_INTERVALS, "MouseDownLatency", 1);
+                CurrentSettings.MouseUpLatency = iniManager.ReadInt(SECTION_INTERVALS, "MouseUpLatency", 1);
+                CurrentSettings.KeyboardInterval = iniManager.ReadInt(SECTION_INTERVALS, "KeyboardInterval", 1);
+                CurrentSettings.KeyboardDownLatency = iniManager.ReadInt(SECTION_INTERVALS, "KeyboardDownLatency", 1);
+                CurrentSettings.KeyboardUpLatency = iniManager.ReadInt(SECTION_INTERVALS, "KeyboardUpLatency", 1);
                 CurrentSettings.UIUpdateInterval = iniManager.ReadInt(SECTION_INTERVALS, "UIUpdateInterval", 100);
 
                 // 값 유효성 검사
@@ -48,6 +50,8 @@ namespace HookAutoFire.Services
                 CurrentSettings.ValidateValues();
 
                 iniManager.WriteInt(SECTION_INTERVALS, "MouseInterval", CurrentSettings.MouseInterval);
+                iniManager.WriteInt(SECTION_INTERVALS, "MouseDownLatency", CurrentSettings.MouseDownLatency);
+                iniManager.WriteInt(SECTION_INTERVALS, "MouseUpLatency", CurrentSettings.MouseUpLatency);
                 iniManager.WriteInt(SECTION_INTERVALS, "KeyboardInterval", CurrentSettings.KeyboardInterval);
                 iniManager.WriteInt(SECTION_INTERVALS, "KeyboardDownLatency", CurrentSettings.KeyboardDownLatency);
                 iniManager.WriteInt(SECTION_INTERVALS, "KeyboardUpLatency", CurrentSettings.KeyboardUpLatency);
