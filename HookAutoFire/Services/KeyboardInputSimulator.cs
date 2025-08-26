@@ -8,8 +8,13 @@ namespace HookAutoFire.Services
 {
     public class KeyboardInputSimulator
     {
+        [DllImport("user32.dll")]
+        private static extern uint MapVirtualKey(uint uCode, uint uMapType);
+
         public void SendKeyDown(int virtualKeyCode)
         {
+            uint scanCode = MapVirtualKey((uint)virtualKeyCode, 0);
+            
             var input = new INPUT
             {
                 type = SendInputEventType.InputKeyboard,
@@ -18,7 +23,7 @@ namespace HookAutoFire.Services
                     ki = new KeyboardInput
                     {
                         wVk = (ushort)virtualKeyCode,
-                        wScan = 0,
+                        wScan = (ushort)scanCode,
                         dwFlags = 0, // Key down
                         time = 0,
                         dwExtraInfo = IntPtr.Zero
@@ -31,6 +36,8 @@ namespace HookAutoFire.Services
 
         public void SendKeyUp(int virtualKeyCode)
         {
+            uint scanCode = MapVirtualKey((uint)virtualKeyCode, 0);
+            
             var input = new INPUT
             {
                 type = SendInputEventType.InputKeyboard,
@@ -39,7 +46,7 @@ namespace HookAutoFire.Services
                     ki = new KeyboardInput
                     {
                         wVk = (ushort)virtualKeyCode,
-                        wScan = 0,
+                        wScan = (ushort)scanCode,
                         dwFlags = KeyboardEventFlags.KEYEVENTF_KEYUP,
                         time = 0,
                         dwExtraInfo = IntPtr.Zero
@@ -53,6 +60,7 @@ namespace HookAutoFire.Services
         public void SendKeyPress(int virtualKeyCode)
         {
             SendKeyDown(virtualKeyCode);
+            System.Threading.Thread.Sleep(1); // 짧은 딜레이 추가
             SendKeyUp(virtualKeyCode);
         }
     }

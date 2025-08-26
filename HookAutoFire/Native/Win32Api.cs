@@ -27,6 +27,9 @@ namespace HookAutoFire.Native
         [DllImport("user32.dll")]
         public static extern uint SendInput(uint nInputs, [MarshalAs(UnmanagedType.LPArray), In] INPUT[] pInputs, int cbSize);
 
+        [DllImport("user32.dll")]
+        public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
+
         #endregion
 
         #region Keyboard State

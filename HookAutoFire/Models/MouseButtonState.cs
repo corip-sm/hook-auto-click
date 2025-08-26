@@ -89,6 +89,7 @@ namespace HookAutoFire.Models
             }
         }
 
+
         public void ResetAll()
         {
             lock (stateLock)

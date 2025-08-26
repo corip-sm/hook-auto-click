@@ -14,6 +14,7 @@ namespace HookAutoFire
         private readonly KeyboardHookManager keyboardHookManager;
         private readonly MouseInputSimulator inputSimulator;
         private readonly AutoFireService autoFireService;
+        private readonly SettingsManager settingsManager;
 
         public frmMain()
         {
@@ -26,6 +27,7 @@ namespace HookAutoFire
             hookManager = new MouseHookManager(buttonState);
             keyboardHookManager = new KeyboardHookManager(buttonState, inputSimulator);
             autoFireService = new AutoFireService(buttonState, inputSimulator);
+            settingsManager = new SettingsManager();
             
             InitializeServices();
         }
@@ -63,6 +65,12 @@ namespace HookAutoFire
                 Application.Exit();
                 return;
             }
+            
+            // 설정 로드 및 적용
+            LoadSettings();
+            
+            // 버튼 이벤트 핸들러 설정
+            SetupButtonEventHandlers();
             
             // 자동 클릭 서비스 시작
             autoFireService.Start();
@@ -211,6 +219,70 @@ namespace HookAutoFire
                 lblStatus.Text = "Status: Hold X1 + SPACE for space auto-click, X1 + mouse for mouse auto-click";
                 lblStatus.ForeColor = Color.FromArgb(200, 200, 200);
             }
+        }
+
+        private void LoadSettings()
+        {
+            settingsManager.LoadSettings();
+            
+            // UI에 설정값 반영
+            nudMouseInterval.Value = settingsManager.CurrentSettings.MouseInterval;
+            nudKeyboardInterval.Value = settingsManager.CurrentSettings.KeyboardInterval;
+            
+            // AutoFireService에 설정값 적용
+            autoFireService.MouseInterval = settingsManager.CurrentSettings.MouseInterval;
+            autoFireService.KeyboardInterval = settingsManager.CurrentSettings.KeyboardInterval;
+        }
+
+        private void SetupButtonEventHandlers()
+        {
+            btnSaveSettings.Click += BtnSaveSettings_Click;
+            btnResetSettings.Click += BtnResetSettings_Click;
+        }
+
+        private void BtnSaveSettings_Click(object? sender, EventArgs e)
+        {
+            // UI에서 설정값 가져와서 저장
+            settingsManager.CurrentSettings.MouseInterval = (int)nudMouseInterval.Value;
+            settingsManager.CurrentSettings.KeyboardInterval = (int)nudKeyboardInterval.Value;
+            
+            settingsManager.SaveSettings();
+            
+            // AutoFireService에 새 설정값 적용
+            autoFireService.MouseInterval = settingsManager.CurrentSettings.MouseInterval;
+            autoFireService.KeyboardInterval = settingsManager.CurrentSettings.KeyboardInterval;
+            
+            // 사용자에게 저장 완료 알림 (상태 표시줄 이용)
+            ShowStatusMessage("설정이 저장되었습니다.", Color.FromArgb(50, 180, 50));
+        }
+
+        private void BtnResetSettings_Click(object? sender, EventArgs e)
+        {
+            settingsManager.ResetToDefaults();
+            LoadSettings(); // UI 업데이트
+            
+            ShowStatusMessage("설정이 초기화되었습니다.", Color.FromArgb(255, 165, 0));
+        }
+
+        private void ShowStatusMessage(string message, Color color)
+        {
+            var originalText = lblStatus.Text;
+            var originalColor = lblStatus.ForeColor;
+            
+            lblStatus.Text = message;
+            lblStatus.ForeColor = color;
+            
+            // 2초 후 원래 상태로 복원
+            var timer = new System.Windows.Forms.Timer();
+            timer.Interval = 2000;
+            timer.Tick += (s, e) =>
+            {
+                lblStatus.Text = originalText;
+                lblStatus.ForeColor = originalColor;
+                timer.Stop();
+                timer.Dispose();
+            };
+            timer.Start();
         }
 
         private void Cleanup()

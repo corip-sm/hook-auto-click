@@ -47,37 +47,49 @@ namespace HookAutoFire.Services
                 int keyEvent = (int)wParam;
                 int vkCode = (int)hookStruct->vkCode;
 
-                // 주입되지 않은 키보드 이벤트만 처리 (마우스 후킹과 유사)
-                if ((hookStruct->flags & 0x01) == 0x00)
+                bool isInjected = (hookStruct->flags & 0x10) != 0x00;
+                
+                // SPACE 키 처리
+                if (vkCode == VK_SPACE)
                 {
+                    // 시뮬레이션된 입력은 그대로 통과
+                    if (isInjected)
+                    {
+                        return CallNextHookEx(IntPtr.Zero, nCode, wParam, lParam);
+                    }
+                    
+                    // 하드웨어 입력만 처리
+                    bool isXButton1Pressed = IsKeyPressed(VK_XBUTTON1);
+                    
                     switch (keyEvent)
                     {
                         case WM_KEYDOWN:
                         case WM_SYSKEYDOWN:
-                            if (vkCode == VK_SPACE)
+                            KeyDown?.Invoke(this, vkCode);
+                            
+                            // X1+SPACE 조합에서만 자동 클릭 시작하고 차단
+                            if (isXButton1Pressed)
                             {
-                                // SPACE 키에 대해 항상 시각적 피드백 트리거
-                                KeyDown?.Invoke(this, vkCode);
-                                
-                                // 자동 클릭 기능을 위해 XBUTTON1이 눌렸는지 확인
-                                if (IsKeyPressed(VK_XBUTTON1))
-                                {
-                                    // SPACE 키 자동 클릭 시작 (마우스가 아님!)
-                                    buttonState.SetSpaceAutoFire(true);
-                                }
+                                buttonState.SetSpaceAutoFire(true);
+                                // 첫 번째 SPACE 시뮬레이션 즉시 실행
+                                ExecuteSpacePress();
+                                return (IntPtr)1; // X1+SPACE 조합일 때만 차단
                             }
-                            break;
+                            break; // 일반 SPACE는 통과
+                            
                         case WM_KEYUP:
                         case WM_SYSKEYUP:
-                            if (vkCode == VK_SPACE)
+                            KeyUp?.Invoke(this, vkCode);
+                            
+                            // SPACE UP이면 자동 클릭 중지
+                            buttonState.SetSpaceAutoFire(false);
+                            
+                            // X1+SPACE 조합이었다면 UP도 차단
+                            if (isXButton1Pressed)
                             {
-                                // SPACE 키에 대해 항상 시각적 피드백 트리거
-                                KeyUp?.Invoke(this, vkCode);
-                                
-                                // SPACE가 해제되면 항상 SPACE 자동 클릭 중지
-                                buttonState.SetSpaceAutoFire(false);
+                                return (IntPtr)1;
                             }
-                            break;
+                            break; // 일반 SPACE UP은 통과
                     }
                 }
             }
@@ -88,6 +100,14 @@ namespace HookAutoFire.Services
         private bool IsKeyPressed(int virtualKeyCode)
         {
             return (GetKeyState(virtualKeyCode) & KEY_PRESSED) != 0;
+        }
+
+        private void ExecuteSpacePress()
+        {
+            var keyboardSimulator = new KeyboardInputSimulator();
+            keyboardSimulator.SendKeyDown(VK_SPACE);
+            System.Threading.Thread.Sleep(10);
+            keyboardSimulator.SendKeyUp(VK_SPACE);
         }
 
         public void Dispose()
