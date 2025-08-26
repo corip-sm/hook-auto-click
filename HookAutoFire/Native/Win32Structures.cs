@@ -81,7 +81,8 @@ namespace HookAutoFire.Native
     [Flags]
     public enum KeyboardEventFlags : uint
     {
-        KEYEVENTF_KEYUP = 0x0002
+        KEYEVENTF_KEYUP = 0x0002,
+        KEYEVENTF_SCANCODE = 0x0008
     }
 
     public enum SendInputEventType : int

@@ -37,6 +37,9 @@ namespace HookAutoFire.Native
         [DllImport("user32.dll")]
         public static extern short GetKeyState(int nVirtKey);
 
+        [DllImport("user32.dll")]
+        public static extern uint MapVirtualKey(uint uCode, uint uMapType);
+
         #endregion
 
         #region Delegates

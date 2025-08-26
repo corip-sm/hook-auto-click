@@ -228,10 +228,14 @@ namespace HookAutoFire
             // UI에 설정값 반영
             nudMouseInterval.Value = settingsManager.CurrentSettings.MouseInterval;
             nudKeyboardInterval.Value = settingsManager.CurrentSettings.KeyboardInterval;
+            nudKeyboardDownLatency.Value = settingsManager.CurrentSettings.KeyboardDownLatency;
+            nudKeyboardUpLatency.Value = settingsManager.CurrentSettings.KeyboardUpLatency;
             
             // AutoFireService에 설정값 적용
             autoFireService.MouseInterval = settingsManager.CurrentSettings.MouseInterval;
             autoFireService.KeyboardInterval = settingsManager.CurrentSettings.KeyboardInterval;
+            autoFireService.KeyboardDownLatency = settingsManager.CurrentSettings.KeyboardDownLatency;
+            autoFireService.KeyboardUpLatency = settingsManager.CurrentSettings.KeyboardUpLatency;
         }
 
         private void SetupButtonEventHandlers()
@@ -245,12 +249,16 @@ namespace HookAutoFire
             // UI에서 설정값 가져와서 저장
             settingsManager.CurrentSettings.MouseInterval = (int)nudMouseInterval.Value;
             settingsManager.CurrentSettings.KeyboardInterval = (int)nudKeyboardInterval.Value;
+            settingsManager.CurrentSettings.KeyboardDownLatency = (int)nudKeyboardDownLatency.Value;
+            settingsManager.CurrentSettings.KeyboardUpLatency = (int)nudKeyboardUpLatency.Value;
             
             settingsManager.SaveSettings();
             
             // AutoFireService에 새 설정값 적용
             autoFireService.MouseInterval = settingsManager.CurrentSettings.MouseInterval;
             autoFireService.KeyboardInterval = settingsManager.CurrentSettings.KeyboardInterval;
+            autoFireService.KeyboardDownLatency = settingsManager.CurrentSettings.KeyboardDownLatency;
+            autoFireService.KeyboardUpLatency = settingsManager.CurrentSettings.KeyboardUpLatency;
             
             // 사용자에게 저장 완료 알림 (상태 표시줄 이용)
             ShowStatusMessage("설정이 저장되었습니다.", Color.FromArgb(50, 180, 50));

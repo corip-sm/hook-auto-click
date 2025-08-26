@@ -44,6 +44,10 @@ partial class frmMain
         this.nudMouseInterval = new System.Windows.Forms.NumericUpDown();
         this.lblKeyboardInterval = new System.Windows.Forms.Label();
         this.nudKeyboardInterval = new System.Windows.Forms.NumericUpDown();
+        this.lblKeyboardDownLatency = new System.Windows.Forms.Label();
+        this.nudKeyboardDownLatency = new System.Windows.Forms.NumericUpDown();
+        this.lblKeyboardUpLatency = new System.Windows.Forms.Label();
+        this.nudKeyboardUpLatency = new System.Windows.Forms.NumericUpDown();
         this.btnSaveSettings = new System.Windows.Forms.Button();
         this.btnResetSettings = new System.Windows.Forms.Button();
         this.lblStatus = new System.Windows.Forms.Label();
@@ -52,6 +56,8 @@ partial class frmMain
         this.pnlSettings.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)(this.nudMouseInterval)).BeginInit();
         ((System.ComponentModel.ISupportInitialize)(this.nudKeyboardInterval)).BeginInit();
+        ((System.ComponentModel.ISupportInitialize)(this.nudKeyboardDownLatency)).BeginInit();
+        ((System.ComponentModel.ISupportInitialize)(this.nudKeyboardUpLatency)).BeginInit();
         this.SuspendLayout();
         
         // lblTitle
@@ -205,11 +211,15 @@ partial class frmMain
         this.pnlSettings.Controls.Add(this.nudMouseInterval);
         this.pnlSettings.Controls.Add(this.lblKeyboardInterval);
         this.pnlSettings.Controls.Add(this.nudKeyboardInterval);
+        this.pnlSettings.Controls.Add(this.lblKeyboardDownLatency);
+        this.pnlSettings.Controls.Add(this.nudKeyboardDownLatency);
+        this.pnlSettings.Controls.Add(this.lblKeyboardUpLatency);
+        this.pnlSettings.Controls.Add(this.nudKeyboardUpLatency);
         this.pnlSettings.Controls.Add(this.btnSaveSettings);
         this.pnlSettings.Controls.Add(this.btnResetSettings);
         this.pnlSettings.Location = new System.Drawing.Point(40, 260);
         this.pnlSettings.Name = "pnlSettings";
-        this.pnlSettings.Size = new System.Drawing.Size(340, 120);
+        this.pnlSettings.Size = new System.Drawing.Size(340, 180);
         this.pnlSettings.TabIndex = 3;
         
         // lblSettingsTitle
@@ -266,16 +276,60 @@ partial class frmMain
         this.nudKeyboardInterval.TabIndex = 4;
         this.nudKeyboardInterval.Value = new decimal(new int[] { 100, 0, 0, 0 });
         
+        // lblKeyboardDownLatency
+        this.lblKeyboardDownLatency.AutoSize = true;
+        this.lblKeyboardDownLatency.Font = new System.Drawing.Font("Segoe UI", 9F);
+        this.lblKeyboardDownLatency.ForeColor = System.Drawing.Color.FromArgb(200, 200, 200);
+        this.lblKeyboardDownLatency.Location = new System.Drawing.Point(15, 100);
+        this.lblKeyboardDownLatency.Name = "lblKeyboardDownLatency";
+        this.lblKeyboardDownLatency.Size = new System.Drawing.Size(125, 15);
+        this.lblKeyboardDownLatency.TabIndex = 5;
+        this.lblKeyboardDownLatency.Text = "키보드 DOWN (ms):";
+        
+        // nudKeyboardDownLatency
+        this.nudKeyboardDownLatency.BackColor = System.Drawing.Color.FromArgb(70, 70, 74);
+        this.nudKeyboardDownLatency.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+        this.nudKeyboardDownLatency.ForeColor = System.Drawing.Color.White;
+        this.nudKeyboardDownLatency.Location = new System.Drawing.Point(150, 98);
+        this.nudKeyboardDownLatency.Maximum = new decimal(new int[] { 200, 0, 0, 0 });
+        this.nudKeyboardDownLatency.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+        this.nudKeyboardDownLatency.Name = "nudKeyboardDownLatency";
+        this.nudKeyboardDownLatency.Size = new System.Drawing.Size(60, 23);
+        this.nudKeyboardDownLatency.TabIndex = 6;
+        this.nudKeyboardDownLatency.Value = new decimal(new int[] { 55, 0, 0, 0 });
+        
+        // lblKeyboardUpLatency
+        this.lblKeyboardUpLatency.AutoSize = true;
+        this.lblKeyboardUpLatency.Font = new System.Drawing.Font("Segoe UI", 9F);
+        this.lblKeyboardUpLatency.ForeColor = System.Drawing.Color.FromArgb(200, 200, 200);
+        this.lblKeyboardUpLatency.Location = new System.Drawing.Point(15, 130);
+        this.lblKeyboardUpLatency.Name = "lblKeyboardUpLatency";
+        this.lblKeyboardUpLatency.Size = new System.Drawing.Size(115, 15);
+        this.lblKeyboardUpLatency.TabIndex = 7;
+        this.lblKeyboardUpLatency.Text = "키보드 UP (ms):";
+        
+        // nudKeyboardUpLatency
+        this.nudKeyboardUpLatency.BackColor = System.Drawing.Color.FromArgb(70, 70, 74);
+        this.nudKeyboardUpLatency.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+        this.nudKeyboardUpLatency.ForeColor = System.Drawing.Color.White;
+        this.nudKeyboardUpLatency.Location = new System.Drawing.Point(150, 128);
+        this.nudKeyboardUpLatency.Maximum = new decimal(new int[] { 200, 0, 0, 0 });
+        this.nudKeyboardUpLatency.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+        this.nudKeyboardUpLatency.Name = "nudKeyboardUpLatency";
+        this.nudKeyboardUpLatency.Size = new System.Drawing.Size(60, 23);
+        this.nudKeyboardUpLatency.TabIndex = 8;
+        this.nudKeyboardUpLatency.Value = new decimal(new int[] { 55, 0, 0, 0 });
+        
         // btnSaveSettings
         this.btnSaveSettings.BackColor = System.Drawing.Color.FromArgb(0, 122, 255);
         this.btnSaveSettings.FlatAppearance.BorderSize = 0;
         this.btnSaveSettings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this.btnSaveSettings.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
         this.btnSaveSettings.ForeColor = System.Drawing.Color.White;
-        this.btnSaveSettings.Location = new System.Drawing.Point(230, 40);
+        this.btnSaveSettings.Location = new System.Drawing.Point(230, 70);
         this.btnSaveSettings.Name = "btnSaveSettings";
         this.btnSaveSettings.Size = new System.Drawing.Size(80, 25);
-        this.btnSaveSettings.TabIndex = 5;
+        this.btnSaveSettings.TabIndex = 9;
         this.btnSaveSettings.Text = "저장";
         this.btnSaveSettings.UseVisualStyleBackColor = false;
         
@@ -285,10 +339,10 @@ partial class frmMain
         this.btnResetSettings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
         this.btnResetSettings.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
         this.btnResetSettings.ForeColor = System.Drawing.Color.White;
-        this.btnResetSettings.Location = new System.Drawing.Point(230, 70);
+        this.btnResetSettings.Location = new System.Drawing.Point(230, 110);
         this.btnResetSettings.Name = "btnResetSettings";
         this.btnResetSettings.Size = new System.Drawing.Size(80, 25);
-        this.btnResetSettings.TabIndex = 6;
+        this.btnResetSettings.TabIndex = 10;
         this.btnResetSettings.Text = "초기화";
         this.btnResetSettings.UseVisualStyleBackColor = false;
         
@@ -296,7 +350,7 @@ partial class frmMain
         this.lblStatus.AutoSize = true;
         this.lblStatus.Font = new System.Drawing.Font("Segoe UI", 10F);
         this.lblStatus.ForeColor = System.Drawing.Color.FromArgb(220, 220, 220);
-        this.lblStatus.Location = new System.Drawing.Point(40, 390);
+        this.lblStatus.Location = new System.Drawing.Point(40, 450);
         this.lblStatus.MaximumSize = new System.Drawing.Size(340, 0);
         this.lblStatus.Name = "lblStatus";
         this.lblStatus.Size = new System.Drawing.Size(340, 38);
@@ -307,7 +361,7 @@ partial class frmMain
         this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
         this.BackColor = System.Drawing.Color.FromArgb(45, 45, 48);
-        this.ClientSize = new System.Drawing.Size(420, 450);
+        this.ClientSize = new System.Drawing.Size(420, 510);
         this.Controls.Add(this.lblStatus);
         this.Controls.Add(this.pnlSettings);
         this.Controls.Add(this.pnlKeyboard);
@@ -326,6 +380,8 @@ partial class frmMain
         this.pnlSettings.PerformLayout();
         ((System.ComponentModel.ISupportInitialize)(this.nudMouseInterval)).EndInit();
         ((System.ComponentModel.ISupportInitialize)(this.nudKeyboardInterval)).EndInit();
+        ((System.ComponentModel.ISupportInitialize)(this.nudKeyboardDownLatency)).EndInit();
+        ((System.ComponentModel.ISupportInitialize)(this.nudKeyboardUpLatency)).EndInit();
         this.ResumeLayout(false);
         this.PerformLayout();
     }
@@ -348,6 +404,10 @@ partial class frmMain
     private System.Windows.Forms.NumericUpDown nudMouseInterval;
     private System.Windows.Forms.Label lblKeyboardInterval;
     private System.Windows.Forms.NumericUpDown nudKeyboardInterval;
+    private System.Windows.Forms.Label lblKeyboardDownLatency;
+    private System.Windows.Forms.NumericUpDown nudKeyboardDownLatency;
+    private System.Windows.Forms.Label lblKeyboardUpLatency;
+    private System.Windows.Forms.NumericUpDown nudKeyboardUpLatency;
     private System.Windows.Forms.Button btnSaveSettings;
     private System.Windows.Forms.Button btnResetSettings;
     private System.Windows.Forms.Label lblStatus;

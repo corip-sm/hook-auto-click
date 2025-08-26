@@ -13,6 +13,7 @@ namespace HookAutoFire.Services
         private IntPtr keyboardHookId;
         private readonly MouseButtonState buttonState;
         private readonly MouseInputSimulator inputSimulator;
+        private bool isSpacePressed = false; // SPACE 키가 눌려있는 상태인지 추적
         
         public event EventHandler<int>? KeyDown;
         public event EventHandler<int>? KeyUp;
@@ -67,19 +68,31 @@ namespace HookAutoFire.Services
                         case WM_SYSKEYDOWN:
                             KeyDown?.Invoke(this, vkCode);
                             
-                            // X1+SPACE 조합에서만 자동 클릭 시작하고 차단
-                            if (isXButton1Pressed)
+                            // 최초 DOWN일 때만 처리 (키 반복 무시)
+                            if (!isSpacePressed)
                             {
-                                buttonState.SetSpaceAutoFire(true);
-                                // 첫 번째 SPACE 시뮬레이션 즉시 실행
-                                ExecuteSpacePress();
-                                return (IntPtr)1; // X1+SPACE 조합일 때만 차단
+                                isSpacePressed = true;
+                                
+                                // X1+SPACE 조합에서만 자동 클릭 시작하고 차단
+                                if (isXButton1Pressed)
+                                {
+                                    buttonState.SetSpaceAutoFire(true);
+                                    return (IntPtr)1; // X1+SPACE 조합일 때만 차단
+                                }
+                            }
+                            else if (isXButton1Pressed)
+                            {
+                                // 키 반복이지만 X1이 눌려있다면 차단
+                                return (IntPtr)1;
                             }
                             break; // 일반 SPACE는 통과
                             
                         case WM_KEYUP:
                         case WM_SYSKEYUP:
                             KeyUp?.Invoke(this, vkCode);
+                            
+                            // SPACE UP 상태로 변경
+                            isSpacePressed = false;
                             
                             // SPACE UP이면 자동 클릭 중지
                             buttonState.SetSpaceAutoFire(false);
@@ -102,13 +115,6 @@ namespace HookAutoFire.Services
             return (GetKeyState(virtualKeyCode) & KEY_PRESSED) != 0;
         }
 
-        private void ExecuteSpacePress()
-        {
-            var keyboardSimulator = new KeyboardInputSimulator();
-            keyboardSimulator.SendKeyDown(VK_SPACE);
-            System.Threading.Thread.Sleep(10);
-            keyboardSimulator.SendKeyUp(VK_SPACE);
-        }
 
         public void Dispose()
         {

@@ -26,6 +26,8 @@ namespace HookAutoFire.Services
             {
                 CurrentSettings.MouseInterval = iniManager.ReadInt(SECTION_INTERVALS, "MouseInterval", 1);
                 CurrentSettings.KeyboardInterval = iniManager.ReadInt(SECTION_INTERVALS, "KeyboardInterval", 10);
+                CurrentSettings.KeyboardDownLatency = iniManager.ReadInt(SECTION_INTERVALS, "KeyboardDownLatency", 55);
+                CurrentSettings.KeyboardUpLatency = iniManager.ReadInt(SECTION_INTERVALS, "KeyboardUpLatency", 55);
                 CurrentSettings.UIUpdateInterval = iniManager.ReadInt(SECTION_INTERVALS, "UIUpdateInterval", 100);
 
                 // 값 유효성 검사
@@ -47,6 +49,8 @@ namespace HookAutoFire.Services
 
                 iniManager.WriteInt(SECTION_INTERVALS, "MouseInterval", CurrentSettings.MouseInterval);
                 iniManager.WriteInt(SECTION_INTERVALS, "KeyboardInterval", CurrentSettings.KeyboardInterval);
+                iniManager.WriteInt(SECTION_INTERVALS, "KeyboardDownLatency", CurrentSettings.KeyboardDownLatency);
+                iniManager.WriteInt(SECTION_INTERVALS, "KeyboardUpLatency", CurrentSettings.KeyboardUpLatency);
                 iniManager.WriteInt(SECTION_INTERVALS, "UIUpdateInterval", CurrentSettings.UIUpdateInterval);
             }
             catch (Exception)
